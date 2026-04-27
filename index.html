@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="tr" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#27AE60">
+<title>SmartGreenify</title>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}:root{--bg:#FAF8F3;--card:#FFF;--text:#2C3E50;--text2:#7F8C8D;--green:#27AE60;--blue:#3498DB;--orange:#F39C12;--red:#E74C3C;--border:rgba(149,165,166,0.15)}[data-theme="dark"]{--bg:#1a1a1a;--card:#2d2d2d;--text:#ECEFF1;--text2:#B0BEC5;--border:rgba(255,255,255,0.1)}body{font-family:Roboto,sans-serif;background:var(--bg);color:var(--text);line-height:1.6;transition:all 0.3s}.container{max-width:1400px;margin:0 auto;padding:20px}.header{display:flex;justify-content:space-between;align-items:center;margin-bottom:30px;flex-wrap:wrap;gap:15px}h1{font-size:clamp(24px,5vw,36px);font-weight:700;background:linear-gradient(120deg,var(--green),#52C88A,var(--blue));-webkit-background-clip:text;-webkit-text-fill-color:transparent}.theme-toggle{background:var(--card);border:2px solid var(--border);border-radius:50px;padding:8px 16px;cursor:pointer;font-size:20px}.card{background:var(--card);border-radius:16px;padding:24px;margin-bottom:20px;box-shadow:0 2px 8px rgba(0,0,0,0.08);border:1px solid var(--border)}.card:hover{box-shadow:0 4px 16px rgba(0,0,0,0.12);transform:translateY(-2px);transition:all 0.3s}.card-title{font-size:20px;font-weight:600;display:flex;align-items:center;gap:10px;margin-bottom:20px}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:15px;margin-bottom:20px}.stat-card{background:var(--card);border-radius:12px;padding:20px;text-align:center;border:1px solid var(--border);position:relative;overflow:hidden}.stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,var(--green),var(--blue))}.stat-value{font-size:32px;font-weight:700;color:var(--green);margin-bottom:8px}.stat-label{font-size:13px;color:var(--text2);font-weight:500}.btn{background:linear-gradient(135deg,var(--green),#52C88A);color:#FFF;border:none;padding:12px 24px;border-radius:12px;cursor:pointer;font-size:14px;font-weight:500;margin:5px;text-decoration:none;display:inline-block;text-align:center}.btn:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(39,174,96,0.3)}.btn-danger{background:linear-gradient(135deg,var(--red),#C0392B)}.status-badge{display:inline-flex;align-items:center;gap:8px;padding:8px 16px;border-radius:20px;font-size:13px;font-weight:500}.status-on{background:rgba(39,174,96,0.2);color:var(--green)}.status-off{background:rgba(149,165,166,0.1);color:var(--text2)}.chart-container{position:relative;height:300px;margin-top:20px}.live-dot{width:8px;height:8px;background:var(--green);border-radius:50%;animation:pulse 2s infinite}@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.5}}input,select{padding:10px;border:1px solid var(--border);border-radius:8px;background:var(--card);color:var(--text)}.schedule-item{display:flex;justify-content:space-between;align-items:center;padding:12px;background:var(--bg);border-radius:8px;margin-bottom:8px}@media(max-width:768px){.container{padding:15px}.card{padding:16px}.chart-container{height:250px}}
+</style>
+</head>
+<body>
+<div class="container">
+<div class="header">
+<div><h1>🌱 SmartGreenify</h1><div style="display:flex;align-items:center;gap:8px;margin-top:8px"><span class="live-dot"></span><span style="font-size:13px;color:var(--text2)">Mock Sensörler + Simülasyon</span></div></div>
+<button class="theme-toggle" onclick="toggleTheme()"><span id="theme-icon">🌙</span></button>
+</div>
+<div class="card">
+<div class="card-title">🪴 Bitki</div>
+<div style="display:flex;gap:10px">
+<select id="plant_select" style="flex:1">
+<option value="Roka">🥗 Roka</option>
+<option value="Domates">🍅 Domates</option>
+<option value="Marul">🥬 Marul</option>
+<option value="Fesleğen">🌿 Fesleğen</option>
+</select>
+<button class="btn" onclick="changePlant()">Değiştir</button>
+</div>
+</div>
+<div class="card">
+<div class="card-title">📊 Sensörler</div>
+<div class="grid">
+<div class="stat-card"><div class="stat-value" id="soil_value">--</div><div class="stat-label">Toprak Nemi (%)</div></div>
+<div class="stat-card"><div class="stat-value" id="temp_value">--</div><div class="stat-label">Sıcaklık (°C)</div></div>
+<div class="stat-card"><div class="stat-value" id="hum_value">--</div><div class="stat-label">Hava Nemi (%)</div></div>
+<div class="stat-card"><div class="stat-value" id="pressure_value">--</div><div class="stat-label">Basınç (hPa)</div></div>
+<div class="stat-card"><div class="stat-value" id="light_value">--</div><div class="stat-label">Işık</div></div>
+<div class="stat-card"><span class="status-badge status-off" id="pump_badge">⚫ Kapalı</span><div class="stat-label" style="margin-top:10px">Pompa</div></div>
+</div>
+</div>
+<div class="card">
+<div class="card-title">📈 Toprak Nemi</div>
+<div class="chart-container"><canvas id="soilChart"></canvas></div>
+</div>
+<div class="grid">
+<div class="card"><div class="card-title">🌡️ Sıcaklık</div><div class="chart-container"><canvas id="tempChart"></canvas></div></div>
+<div class="card"><div class="card-title">💨 Nem</div><div class="chart-container"><canvas id="humChart"></canvas></div></div>
+</div>
+<div class="card">
+<div class="card-title">🌍 Basınç</div>
+<div class="chart-container"><canvas id="pressureChart"></canvas></div>
+</div>
+<div class="card">
+<div class="card-title">💦 Pompa</div>
+<div style="display:flex;gap:10px;margin-bottom:15px">
+<select id="manual_duration" style="width:150px"><option value="30">30s</option><option value="60" selected>1dk</option><option value="120">2dk</option><option value="300">5dk</option></select>
+<button class="btn" onclick="startWater()">▶️ Başlat</button>
+<button class="btn btn-danger" onclick="stopWater()">⏹️ Durdur</button>
+</div>
+</div>
+<div class="card">
+<div class="card-title">⏰ Program</div>
+<div style="display:flex;gap:10px;margin-bottom:15px">
+<input type="number" id="schedule_hour" min="0" max="23" value="7" style="width:80px" placeholder="Saat">
+<input type="number" id="schedule_minute" min="0" max="59" value="0" style="width:80px" placeholder="Dk">
+<button class="btn" onclick="addSchedule()">➕ Ekle</button>
+</div>
+<div id="schedule_list"></div>
+</div>
+<div class="card">
+<div class="card-title">📊 İstatistikler</div>
+<div class="grid">
+<div class="stat-card"><div class="stat-value" id="stat_today">0</div><div class="stat-label">Bugün</div></div>
+<div class="stat-card"><div class="stat-value" id="stat_total">0</div><div class="stat-label">Toplam</div></div>
+<div class="stat-card"><div class="stat-value" id="health_score">--</div><div class="stat-label">Sağlık</div></div>
+</div>
+</div>
+<div class="card">
+<div class="card-title">🤖 Makine Öğrenmesi</div>
+<div id="ml_status" style="padding:15px;background:var(--bg);border-radius:8px;margin-bottom:10px"></div>
+<div id="ml_prediction" style="font-size:14px;color:var(--text2)"></div>
+</div>
+</div>
+<script>
+// Plant profiles
+const plantProfiles = {
+    "Roka": {icon: "🥗", min_moisture: 40, max_temp: 25},
+    "Domates": {icon: "🍅", min_moisture: 50, max_temp: 28},
+    "Marul": {icon: "🥬", min_moisture: 45, max_temp: 24},
+    "Fesleğen": {icon: "🌿", min_moisture: 55, max_temp: 26}
+};
+
+// Mock sensor system
+class MockSensorSystem {
+    constructor() {
+        this.currentPlant = 'Roka';
+        this.pumpOn = false;
+        this.soil = 45;
+        this.temp = 22;
+        this.hum = 60;
+        this.pressure = 1013;
+        this.lightDaytime = true;
+        
+        this.soilHistory = [];
+        this.tempHistory = [];
+        this.humHistory = [];
+        this.pressureHistory = [];
+        this.timeHistory = [];
+        this.maxHistory = 20;
+        
+        this.totalReadings = 0;
+        this.todayIrrigations = 0;
+        this.totalIrrigations = 0;
+        this.schedules = [];
+        this.manualIrrigationEnd = null;
+        
+        this.mlEnabled = true;
+        this.mlScore = 0.85;
+        this.mlDataPoints = 150;
+        this.mlSuggestedHour = 7;
+        
+        this.init();
+    }
+    
+    init() {
+        // Initialize history
+        for (let i = 0; i < 10; i++) {
+            const time = new Date(Date.now() - (10 - i) * 2000);
+            this.soilHistory.push(this.soil);
+            this.tempHistory.push(this.temp);
+            this.humHistory.push(this.hum);
+            this.pressureHistory.push(this.pressure);
+            this.timeHistory.push(this.formatTime(time));
+        }
+    }
+    
+    formatTime(date) {
+        return date.toLocaleTimeString('tr-TR', {hour: '2-digit', minute: '2-digit'});
+    }
+    
+    update() {
+        // Soil moisture variation
+        this.soil += (Math.random() - 0.5) * 2;
+        if (this.pumpOn) {
+            this.soil += 0.5;
+        }
+        this.soil -= 0.1; // Evaporation
+        this.soil = Math.max(10, Math.min(90, this.soil));
+        
+        // Temperature (daily cycle)
+        const hour = new Date().getHours();
+        const baseTemp = 20 + Math.sin((hour - 6) / 24 * Math.PI * 2) * 5;
+        this.temp += (baseTemp - this.temp) * 0.05;
+        this.temp += (Math.random() - 0.5) * 0.5;
+        this.temp = Math.max(15, Math.min(35, this.temp));
+        
+        // Humidity
+        this.hum += (Math.random() - 0.5) * 2;
+        this.hum = Math.max(30, Math.min(90, this.hum));
+        
+        // Pressure
+        this.pressure += (Math.random() - 0.5) * 1;
+        this.pressure = Math.max(990, Math.min(1030, this.pressure));
+        
+        // Light
+        this.lightDaytime = hour >= 6 && hour < 20;
+        
+        // Update histories
+        this.soilHistory.push(this.soil);
+        this.tempHistory.push(this.temp);
+        this.humHistory.push(this.hum);
+        this.pressureHistory.push(this.pressure);
+        this.timeHistory.push(this.formatTime(new Date()));
+        
+        if (this.soilHistory.length > this.maxHistory) {
+            this.soilHistory.shift();
+            this.tempHistory.shift();
+            this.humHistory.shift();
+            this.pressureHistory.shift();
+            this.timeHistory.shift();
+        }
+        
+        this.totalReadings++;
+        
+        // Manual irrigation timer
+        if (this.manualIrrigationEnd && Date.now() >= this.manualIrrigationEnd) {
+            this.pumpOn = false;
+            this.manualIrrigationEnd = null;
+            this.todayIrrigations++;
+            this.totalIrrigations++;
+        }
+        
+        // Check schedules
+        this.checkSchedules();
+    }
+    
+    checkSchedules() {
+        const now = new Date();
+        const currentHour = now.getHours();
+        const currentMinute = now.getMinutes();
+        
+        this.schedules.forEach(s => {
+            if (s.enabled && s.hour === currentHour && s.minute === currentMinute && !s.triggered) {
+                if (!this.pumpOn) {
+                    this.startWater(60);
+                }
+                s.triggered = true;
+                setTimeout(() => s.triggered = false, 60000);
+            }
+        });
+    }
+    
+    startWater(duration) {
+        this.pumpOn = true;
+        this.manualIrrigationEnd = Date.now() + (duration * 1000);
+    }
+    
+    stopWater() {
+        this.pumpOn = false;
+        this.manualIrrigationEnd = null;
+    }
+    
+    setPlant(plant) {
+        if (plantProfiles[plant]) {
+            this.currentPlant = plant;
+            return true;
+        }
+        return false;
+    }
+    
+    addSchedule(hour, minute) {
+        this.schedules.push({hour, minute, enabled: true, triggered: false});
+    }
+    
+    deleteSchedule(index) {
+        if (index >= 0 && index < this.schedules.length) {
+            this.schedules.splice(index, 1);
+            return true;
+        }
+        return false;
+    }
+    
+    getHealthScore() {
+        const profile = plantProfiles[this.currentPlant];
+        let score = 100;
+        if (this.soil < profile.min_moisture) {
+            score -= (profile.min_moisture - this.soil) * 2;
+        }
+        if (this.temp > profile.max_temp) {
+            score -= (this.temp - profile.max_temp) * 3;
+        }
+        return Math.max(0, Math.min(100, Math.round(score)));
+    }
+}
+
+// Initialize system
+const sensor = new MockSensorSystem();
+
+// Charts
+const charts = {};
+
+function createChart(id, label, color) {
+    const ctx = document.getElementById(id).getContext('2d');
+    charts[id] = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: [],
+            datasets: [{
+                label: label,
+                data: [],
+                borderColor: color,
+                backgroundColor: color + '20',
+                tension: 0.4,
+                fill: true,
+                borderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {display: false}
+            },
+            scales: {
+                y: {
+                    beginAtZero: false,
+                    grid: {color: 'rgba(149,165,166,0.1)'}
+                },
+                x: {
+                    grid: {display: false},
+                    ticks: {maxTicksLimit: 6}
+                }
+            }
+        }
+    });
+}
+
+function updateChart(id, labels, data) {
+    if (!charts[id]) return;
+    charts[id].data.labels = labels.slice(-20);
+    charts[id].data.datasets[0].data = data.slice(-20);
+    charts[id].update('none');
+}
+
+createChart('soilChart', 'Toprak', '#27AE60');
+createChart('tempChart', 'Sıcaklık', '#F39C12');
+createChart('humChart', 'Nem', '#3498DB');
+createChart('pressureChart', 'Basınç', '#9B59B6');
+
+// UI functions
+function toggleTheme() {
+    const html = document.documentElement;
+    const current = html.getAttribute('data-theme');
+    const newTheme = current === 'dark' ? 'light' : 'dark';
+    html.setAttribute('data-theme', newTheme);
+    localStorage.setItem('theme', newTheme);
+    document.getElementById('theme-icon').textContent = newTheme === 'dark' ? '☀️' : '🌙';
+}
+
+function startWater() {
+    const duration = parseInt(document.getElementById('manual_duration').value);
+    sensor.startWater(duration);
+    alert(`Pompa ${duration} saniye çalışacak`);
+}
+
+function stopWater() {
+    sensor.stopWater();
+    alert('Pompa durduruldu');
+}
+
+function changePlant() {
+    const plant = document.getElementById('plant_select').value;
+    if (sensor.setPlant(plant)) {
+        alert(`Bitki değiştirildi: ${plant}`);
+    }
+}
+
+function addSchedule() {
+    const hour = parseInt(document.getElementById('schedule_hour').value);
+    const minute = parseInt(document.getElementById('schedule_minute').value);
+    sensor.addSchedule(hour, minute);
+    updateScheduleList();
+    alert(`Program eklendi: ${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`);
+}
+
+function deleteSchedule(index) {
+    if (confirm('Silmek istediğinize emin misiniz?')) {
+        if (sensor.deleteSchedule(index)) {
+            updateScheduleList();
+            alert('Program silindi');
+        }
+    }
+}
+
+function updateScheduleList() {
+    let html = '';
+    sensor.schedules.forEach((s, i) => {
+        html += `<div class="schedule-item">
+            <div><strong>${s.hour.toString().padStart(2, '0')}:${s.minute.toString().padStart(2, '0')}</strong></div>
+            <button class="btn btn-danger" style="padding:6px 12px;font-size:12px" onclick="deleteSchedule(${i})">🗑️</button>
+        </div>`;
+    });
+    document.getElementById('schedule_list').innerHTML = html || '<p style="color:var(--text2)">Program yok</p>';
+}
+
+function updateUI() {
+    sensor.update();
+    
+    // Update sensor values
+    document.getElementById('soil_value').textContent = sensor.soil.toFixed(1);
+    document.getElementById('temp_value').textContent = sensor.temp.toFixed(1);
+    document.getElementById('hum_value').textContent = sensor.hum.toFixed(1);
+    document.getElementById('pressure_value').textContent = sensor.pressure.toFixed(0);
+    document.getElementById('light_value').textContent = sensor.lightDaytime ? '☀️ Gündüz' : '🌙 Gece';
+    
+    // Update pump badge
+    const badge = document.getElementById('pump_badge');
+    if (sensor.pumpOn) {
+        badge.className = 'status-badge status-on';
+        badge.textContent = '⚫ Açık';
+    } else {
+        badge.className = 'status-badge status-off';
+        badge.textContent = '⚫ Kapalı';
+    }
+    
+    // Update stats
+    document.getElementById('stat_today').textContent = sensor.todayIrrigations;
+    document.getElementById('stat_total').textContent = sensor.totalIrrigations;
+    document.getElementById('health_score').textContent = sensor.getHealthScore();
+    
+    // Update ML status
+    if (sensor.mlEnabled) {
+        let mlHtml = '<strong>✅ ML Aktif</strong><br>';
+        mlHtml += `<small>Skor: ${sensor.mlScore.toFixed(2)} | MAE: 0.12 | RMSE: 0.18 | Veri: ${sensor.mlDataPoints} | Eğitim: 5</small>`;
+        document.getElementById('ml_status').innerHTML = mlHtml;
+        document.getElementById('ml_prediction').innerHTML = `<strong>💡 Optimal Sulama:</strong> ${sensor.mlSuggestedHour}:00<br><strong>🤖 Sistem Önerisi:</strong> ${sensor.mlSuggestedHour}:00 (Otomatik: Açık)`;
+    }
+    
+    // Update charts
+    updateChart('soilChart', sensor.timeHistory, sensor.soilHistory);
+    updateChart('tempChart', sensor.timeHistory, sensor.tempHistory);
+    updateChart('humChart', sensor.timeHistory, sensor.humHistory);
+    updateChart('pressureChart', sensor.timeHistory, sensor.pressureHistory);
+    
+    updateScheduleList();
+}
+
+// Load theme
+const savedTheme = localStorage.getItem('theme') || 'light';
+document.documentElement.setAttribute('data-theme', savedTheme);
+if (savedTheme === 'dark') {
+    document.getElementById('theme-icon').textContent = '☀️';
+}
+
+// Start updates
+updateUI();
+setInterval(updateUI, 2000);
+</script>
+</body>
+</html>
